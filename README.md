@@ -63,7 +63,7 @@ In traditional consultation and service centres (career counselling, educational
 
 ### Step 1: Open Terminal in Project Directory
 ```powershell
-cd "e:\utu sem 5\BookMySlot\src\BookMySlot"
+cd "BookMySlot"
 ```
 
 ### Step 2: Run the Web Application
@@ -111,7 +111,7 @@ The system provides two public JSON endpoints documenting the configured time zo
 
 Run the automated test suite from the solution root:
 ```powershell
-cd "e:\utu sem 5\BookMySlot"
+cd "BookMySlot"
 dotnet test BookMySlot.slnx
 ```
 
@@ -134,21 +134,6 @@ Passed!  - Failed: 0, Passed: 8, Skipped: 0, Total: 8, Duration: 2 s
 
 - **Architecture Guide:** [`docs/architecture.md`](docs/architecture.md)
 - **Data Dictionary:** [`docs/data-dictionary.md`](docs/data-dictionary.md)
-- **Student Viva Guide:** [`docs/viva-guide.md`](docs/viva-guide.md)
-- **Technical Poster Source (A2 HTML):** [`docs/poster.html`](docs/poster.html)
-- **Technical Poster (A2 Print PDF):** [`docs/BookMySlot_A2_Poster.pdf`](docs/BookMySlot_A2_Poster.pdf)
 - **Application Screenshots:** [`docs/screenshots/`](docs/screenshots/)
 
----
 
-## 10. How to Push Code to GitHub
-
-```bash
-cd "e:\utu sem 5\BookMySlot"
-git init
-git add .
-git commit -m "Initial commit: BookMySlot Appointment Booking System"
-git branch -M main
-git remote add origin https://github.com/your-username/BookMySlot.git
-git push -u origin main
-```
