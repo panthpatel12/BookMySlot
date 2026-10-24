@@ -1,0 +1,27 @@
+@{
+    ViewData["Title"] = "Access Denied";
+}
+
+<div class="container py-5 text-center">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-sm border-0 p-5 rounded-4">
+                <div class="text-danger mb-3">
+                    <i class="bi bi-shield-x" style="font-size: 4rem;"></i>
+                </div>
+                <h2 class="fw-bold text-dark">Access Denied</h2>
+                <p class="text-muted mb-4">
+                    You do not possess the required role permissions to access this administrative or protected resource.
+                </p>
+                <div>
+                    <a asp-controller="Home" asp-action="Index" class="btn btn-bms-primary me-2">
+                        <i class="bi bi-house-door me-1"></i>Back to Home
+                    </a>
+                    <a asp-controller="Account" asp-action="Login" class="btn btn-bms-outline-teal">
+                        <i class="bi bi-person-circle me-1"></i>Switch Account
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,25 @@
+## .gitignore for BookMySlot ASP.NET Core Project
+
+# Build results
+[Bb]in/
+[Oo]bj/
+*.user
+*.userosscache
+*.sln.docstates
+
+# Database & local secrets
+*.db
+*.db-shm
+*.db-wal
+.env
+appsettings.*.local.json
+
+# Visual Studio / Rider / VS Code cache
+.vs/
+.idea/
+.vscode/
+*.suo
+*.userprefs
+
+# Logs
+*.log

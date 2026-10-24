@@ -1,0 +1,135 @@
+@model BookMySlot.ViewModels.Admin.AdminAppointmentListViewModel
+@{
+    ViewData["Title"] = "Platform Appointments";
+}
+
+<div class="container py-4">
+    <!-- Header -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold text-dark mb-1">Platform Appointments</h2>
+            <p class="text-muted small mb-0">Search, filter, and inspect all bookings across customers and providers.</p>
+        </div>
+        <span class="badge bg-light text-secondary border">
+            <i class="bi bi-clock me-1"></i>Times in @Model.TimeZoneDisplayName
+        </span>
+    </div>
+
+    <!-- Filter Card (with Session State remembrance) -->
+    <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+        <form method="get" asp-action="Appointments" class="row g-3 align-items-end">
+            <div class="col-md-3">
+                <label class="form-label small fw-semibold text-secondary">Search Keyword</label>
+                <input type="text" name="searchTerm" class="form-control" placeholder="Customer, specialist, email..." 
+                       value="@Model.Filter.SearchTerm" />
+            </div>
+
+            <div class="col-md-2">
+                <label class="form-label small fw-semibold text-secondary">Status</label>
+                <select name="status" class="form-select">
+                    <option value="">-- All Statuses --</option>
+                    @foreach (var val in Enum.GetValues<BookMySlot.Models.AppointmentStatus>())
+                    {
+                        <option value="@val" selected="@(Model.Filter.Status == val)">@val</option>
+                    }
+                </select>
+            </div>
+
+            <div class="col-md-2">
+                <label class="form-label small fw-semibold text-secondary">Service</label>
+                <select name="serviceId" class="form-select" asp-items="Model.ServicesList">
+                    <option value="">-- All Services --</option>
+                </select>
+            </div>
+
+            <div class="col-md-2">
+                <label class="form-label small fw-semibold text-secondary">Provider</label>
+                <select name="providerId" class="form-select" asp-items="Model.ProvidersList">
+                    <option value="">-- All Providers --</option>
+                </select>
+            </div>
+
+            <div class="col-md-3 d-flex gap-2">
+                <button type="submit" class="btn btn-bms-primary flex-grow-1">
+                    <i class="bi bi-filter me-1"></i>Apply Filter
+                </button>
+                <a asp-action="Appointments" asp-route-clear="true" class="btn btn-outline-secondary" title="Clear Filters & Reset Session">
+                    <i class="bi bi-x-circle me-1"></i>Reset
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Results Table -->
+    <div class="card border-0 shadow-sm rounded-4 table-card">
+        <div class="table-card-header d-flex justify-content-between align-items-center">
+            <span class="fw-bold"><i class="bi bi-card-list text-teal me-1"></i>Bookings List</span>
+            <span class="badge bg-teal-soft text-teal">@Model.Appointments.Count Matches</span>
+        </div>
+        <div class="card-body p-0">
+            @if (Model.Appointments.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th>Booking ID</th>
+                                <th>Customer</th>
+                                <th>Provider</th>
+                                <th>Service</th>
+                                <th>Schedule</th>
+                                <th>Fee</th>
+                                <th>Booked At</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var a in Model.Appointments)
+                            {
+                                <tr>
+                                    <td><span class="text-muted small">#@a.Id</span></td>
+                                    <td>
+                                        <div class="fw-bold text-dark">@a.CustomerName</div>
+                                        <div class="small text-muted">@a.CustomerEmail</div>
+                                    </td>
+                                    <td>
+                                        <div class="fw-semibold text-secondary">@a.ProviderName</div>
+                                    </td>
+                                    <td>@a.ServiceName</td>
+                                    <td class="small fw-semibold text-dark">@a.FormattedTime</td>
+                                    <td class="fw-bold">₹@a.ServicePrice.ToString("N0")</td>
+                                    <td class="small text-muted">@a.FormattedBookedAt</td>
+                                    <td>
+                                        @if (a.Status == BookMySlot.Models.AppointmentStatus.Booked)
+                                        {
+                                            <span class="status-badge status-booked">Booked</span>
+                                        }
+                                        else if (a.Status == BookMySlot.Models.AppointmentStatus.Completed)
+                                        {
+                                            <span class="status-badge status-completed">Completed</span>
+                                        }
+                                        else if (a.Status == BookMySlot.Models.AppointmentStatus.Cancelled)
+                                        {
+                                            <span class="status-badge status-cancelled">Cancelled</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="status-badge status-noshow">No Show</span>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="text-center py-5">
+                    <i class="bi bi-search text-muted fs-1 mb-2"></i>
+                    <p class="text-muted small mb-0">No appointments found matching your filter criteria.</p>
+                </div>
+            }
+        </div>
+    </div>
+</div>

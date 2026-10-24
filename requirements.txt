@@ -1,0 +1,79 @@
+================================================================================
+BookMySlot — Appointment Booking System
+SYSTEM REQUIREMENTS & DEPENDENCY SPECIFICATION
+================================================================================
+
+1. SYSTEM & OPERATING SYSTEM REQUIREMENTS:
+--------------------------------------------------------------------------------
+- Operating System: Windows 10/11, macOS (12+), or Linux (Ubuntu 20.04+, Debian, Fedora)
+- Architecture: x64 or ARM64
+- Memory (RAM): Minimum 4 GB (8 GB recommended)
+- Disk Space: 500 MB free disk space for runtime and packages
+- Browser: Google Chrome, Microsoft Edge, Mozilla Firefox, or Safari
+
+2. RUNTIME & SDK REQUIREMENTS:
+--------------------------------------------------------------------------------
+- .NET SDK: Version 10.0 (or .NET 8.0+)
+- Download URL: https://dotnet.microsoft.com/download
+- Verification command:
+    dotnet --version
+
+3. DATABASE SPECIFICATION (ZERO CONFIGURATION):
+--------------------------------------------------------------------------------
+- Database Engine: SQLite (File-based: bookmyslot.db)
+- External Database Server: NOT REQUIRED (SQLite is fully embedded)
+- Note: SQLite is built into the application via EF Core. You do NOT need
+  to install MySQL, SQL Server, or Docker on the target PC! The database file
+  and all tables are created automatically on the first run.
+
+4. NUGET PACKAGES (Automatically restored via dotnet restore):
+--------------------------------------------------------------------------------
+Project: src/BookMySlot/BookMySlot.csproj
+  - Microsoft.EntityFrameworkCore.Sqlite (v10.0.13)
+  - Microsoft.AspNetCore.Identity.EntityFrameworkCore (v10.0.13)
+  - Microsoft.EntityFrameworkCore.Tools (v10.0.13)
+  - Microsoft.EntityFrameworkCore.Design (v10.0.13)
+
+Project: tests/BookMySlot.Tests/BookMySlot.Tests.csproj
+  - Microsoft.NET.Test.Sdk (v17.13.0)
+  - xunit (v2.9.3)
+  - xunit.runner.visualstudio (v3.0.2)
+  - Microsoft.EntityFrameworkCore.Sqlite (v10.0.13)
+  - Microsoft.AspNetCore.Mvc.Testing (v10.0.13)
+
+5. APPLICATION NETWORK PORTS:
+--------------------------------------------------------------------------------
+- Default HTTP Port: 5100  (http://localhost:5100)
+- Optional HTTPS Port: 7100 (https://localhost:7100)
+
+6. PRE-CONFIGURED DEMO ACCOUNTS (SEEDED AUTOMATICALLY ON FIRST RUN):
+--------------------------------------------------------------------------------
+- Administrator:
+    Email:    admin@bookmyslot.com
+    Password: Admin123!
+    Direct:   http://localhost:5100/Admin/Dashboard
+
+- Service Provider (Specialist):
+    Email:    provider@bookmyslot.com
+    Password: Provider123!
+    Direct:   http://localhost:5100/Provider/Dashboard
+
+- Customer (Client):
+    Email:    customer@bookmyslot.com
+    Password: Customer123!
+    Direct:   http://localhost:5100/Customer/Dashboard
+
+7. HOW TO RUN ON A DIFFERENT PC (ONE COMMAND):
+--------------------------------------------------------------------------------
+Windows:
+    Double-click "run.bat"
+    OR open PowerShell / Command Prompt in this folder and run:
+    cd src\BookMySlot
+    dotnet run --urls "http://localhost:5100"
+
+Mac / Linux:
+    cd src/BookMySlot
+    dotnet run --urls "http://localhost:5100"
+
+Then open your browser to: http://localhost:5100
+================================================================================

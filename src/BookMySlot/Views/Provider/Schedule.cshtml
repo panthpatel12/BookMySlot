@@ -1,0 +1,155 @@
+@model BookMySlot.ViewModels.Provider.ProviderScheduleViewModel
+@{
+    ViewData["Title"] = "Daily Schedule";
+    var prevDate = Model.SelectedDate.AddDays(-1).ToString("yyyy-MM-dd");
+    var nextDate = Model.SelectedDate.AddDays(1).ToString("yyyy-MM-dd");
+    var todayDate = DateTime.Today.ToString("yyyy-MM-dd");
+}
+
+<div class="container py-4">
+    <!-- Header with Date Navigator -->
+    <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+        <div class="row align-items-center g-3">
+            <div class="col-lg-6">
+                <span class="badge bg-light text-secondary border mb-1">
+                    <i class="bi bi-clock me-1"></i>All times in @Model.TimeZoneDisplayName
+                </span>
+                <h3 class="fw-bold text-dark mb-0">@Model.FormattedDate</h3>
+            </div>
+            <div class="col-lg-6">
+                <form method="get" asp-action="Schedule" class="d-flex flex-wrap gap-2 justify-content-lg-end align-items-center">
+                    <a asp-action="Schedule" asp-route-date="@prevDate" class="btn btn-outline-secondary btn-sm" title="Previous Day">
+                        <i class="bi bi-chevron-left"></i>
+                    </a>
+                    <a asp-action="Schedule" asp-route-date="@todayDate" class="btn btn-outline-secondary btn-sm">
+                        Today
+                    </a>
+                    <input type="date" name="date" class="form-control form-control-sm" style="width: auto;" 
+                           value="@Model.SelectedDate.ToString("yyyy-MM-dd")" onchange="this.form.submit()" />
+                    <a asp-action="Schedule" asp-route-date="@nextDate" class="btn btn-outline-secondary btn-sm" title="Next Day">
+                        <i class="bi bi-chevron-right"></i>
+                    </a>
+                    <a asp-action="CreateSlot" class="btn btn-bms-teal btn-sm ms-2">
+                        <i class="bi bi-plus-lg me-1"></i>Add Slot
+                    </a>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slots Timeline / List -->
+    <div class="card border-0 shadow-sm rounded-4 table-card">
+        <div class="table-card-header d-flex justify-content-between align-items-center">
+            <div class="fw-bold d-flex align-items-center gap-2">
+                <i class="bi bi-calendar3-range text-teal"></i>
+                <span>Slots Schedule for @Model.SelectedDate.ToString("dd MMM yyyy")</span>
+            </div>
+            <span class="badge bg-teal-soft text-teal">@Model.Slots.Count Total Slots</span>
+        </div>
+        <div class="card-body p-0">
+            @if (Model.Slots.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th>Time Range</th>
+                                <th>Service</th>
+                                <th>Slot State</th>
+                                <th>Client Details</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var slot in Model.Slots)
+                            {
+                                <tr>
+                                    <td>
+                                        <div class="fw-bold text-dark fs-6">@slot.FormattedTime</div>
+                                        <div class="small text-muted">@slot.DurationMinutes mins</div>
+                                    </td>
+                                    <td>
+                                        <div class="fw-semibold text-dark">@slot.ServiceName</div>
+                                        <div class="small text-muted">₹@slot.Price.ToString("N0")</div>
+                                    </td>
+                                    <td>
+                                        @if (slot.IsBooked)
+                                        {
+                                            <span class="status-badge status-booked">
+                                                <i class="bi bi-lock-fill me-1"></i>Booked
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="status-badge status-completed">
+                                                <i class="bi bi-unlock-fill me-1"></i>Available
+                                            </span>
+                                        }
+                                    </td>
+                                    <td>
+                                        @if (slot.IsBooked)
+                                        {
+                                            <div class="fw-semibold text-dark">@slot.CustomerName</div>
+                                            <div class="small text-muted">@slot.CustomerEmail</div>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted small">No booking yet</span>
+                                        }
+                                    </td>
+                                    <td class="text-end">
+                                        @if (slot.CanMarkStatus && slot.AppointmentId.HasValue)
+                                        {
+                                            <div class="d-inline-flex gap-1">
+                                                <form asp-action="MarkStatus" method="post" class="d-inline">
+                                                    @Html.AntiForgeryToken()
+                                                    <input type="hidden" name="appointmentId" value="@slot.AppointmentId.Value" />
+                                                    <input type="hidden" name="status" value="Completed" />
+                                                    <input type="hidden" name="returnDate" value="@Model.SelectedDate.ToString("yyyy-MM-dd")" />
+                                                    <button type="submit" class="btn btn-sm btn-success" title="Mark session as Completed">
+                                                        <i class="bi bi-check-lg"></i>
+                                                    </button>
+                                                </form>
+                                                <form asp-action="MarkStatus" method="post" class="d-inline">
+                                                    @Html.AntiForgeryToken()
+                                                    <input type="hidden" name="appointmentId" value="@slot.AppointmentId.Value" />
+                                                    <input type="hidden" name="status" value="NoShow" />
+                                                    <input type="hidden" name="returnDate" value="@Model.SelectedDate.ToString("yyyy-MM-dd")" />
+                                                    <button type="submit" class="btn btn-sm btn-outline-warning text-dark" title="Mark as No-Show">
+                                                        <i class="bi bi-person-x"></i>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        }
+
+                                        @if (slot.CanRemoveSlot)
+                                        {
+                                            <form asp-action="DeleteSlot" method="post" class="d-inline" onsubmit="return confirm('Remove this unbooked slot?');">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="slotId" value="@slot.SlotId" />
+                                                <input type="hidden" name="returnDate" value="@Model.SelectedDate.ToString("yyyy-MM-dd")" />
+                                                <button type="submit" class="btn btn-sm btn-outline-danger" title="Remove open slot">
+                                                    <i class="bi bi-trash3"></i>
+                                                </button>
+                                            </form>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="text-center py-5">
+                    <i class="bi bi-calendar-minus text-muted fs-1 mb-2"></i>
+                    <p class="text-muted small mb-3">No slots configured for this day.</p>
+                    <a asp-action="CreateSlot" class="btn btn-bms-teal btn-sm">
+                        <i class="bi bi-plus-lg me-1"></i>Create Slot for @Model.SelectedDate.ToString("dd MMM")
+                    </a>
+                </div>
+            }
+        </div>
+    </div>
+</div>

@@ -1,0 +1,213 @@
+@model BookMySlot.ViewModels.Provider.ProviderDashboardViewModel
+@{
+    ViewData["Title"] = "Provider Dashboard";
+}
+
+<div class="container py-4">
+    <!-- Header -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold text-dark mb-1">Provider Portal</h2>
+            <p class="text-muted small mb-0">Welcome, <strong>@Model.ProviderName</strong>. Manage your availability and client sessions.</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a asp-action="Schedule" class="btn btn-outline-secondary">
+                <i class="bi bi-calendar3 me-1"></i>Daily Schedule
+            </a>
+            <a asp-action="CreateSlot" class="btn btn-bms-teal shadow-sm">
+                <i class="bi bi-plus-circle me-1"></i>Create Appointment Slot
+            </a>
+        </div>
+    </div>
+
+    <!-- Stat Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3 col-sm-6">
+            <div class="stat-card">
+                <div class="stat-icon primary">
+                    <i class="bi bi-calendar-day"></i>
+                </div>
+                <div>
+                    <div class="stat-value">@Model.TodayAppointmentsCount</div>
+                    <div class="stat-label">Today's Sessions</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <div class="stat-card">
+                <div class="stat-icon teal">
+                    <i class="bi bi-calendar2-week"></i>
+                </div>
+                <div>
+                    <div class="stat-value">@Model.UpcomingAppointmentsCount</div>
+                    <div class="stat-label">Upcoming Booked</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <div class="stat-card">
+                <div class="stat-icon success">
+                    <i class="bi bi-check2-all"></i>
+                </div>
+                <div>
+                    <div class="stat-value">@Model.CompletedAppointmentsCount</div>
+                    <div class="stat-label">Completed Total</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <div class="stat-card">
+                <div class="stat-icon warning">
+                    <i class="bi bi-hourglass-split"></i>
+                </div>
+                <div>
+                    <div class="stat-value">@Model.ActiveSlotsCount</div>
+                    <div class="stat-label">Active Slots Open</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Today's Sessions -->
+    <div class="card border-0 shadow-sm rounded-4 mb-4 table-card">
+        <div class="table-card-header d-flex justify-content-between align-items-center">
+            <div class="fw-bold d-flex align-items-center gap-2">
+                <i class="bi bi-bell-fill text-warning"></i>
+                <span>Today's Sessions</span>
+            </div>
+            <a asp-action="Schedule" class="btn btn-outline-secondary btn-sm">Full Schedule View</a>
+        </div>
+        <div class="card-body p-0">
+            @if (Model.TodayAppointments.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th>Client Name</th>
+                                <th>Service</th>
+                                <th>Time</th>
+                                <th>Status</th>
+                                <th class="text-end">Mark Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var appt in Model.TodayAppointments)
+                            {
+                                <tr>
+                                    <td>
+                                        <div class="fw-bold text-dark">@appt.CustomerName</div>
+                                        <div class="small text-muted">@appt.CustomerEmail</div>
+                                    </td>
+                                    <td>@appt.ServiceName</td>
+                                    <td class="small fw-semibold">@appt.FormattedTime</td>
+                                    <td>
+                                        @if (appt.Status == BookMySlot.Models.AppointmentStatus.Booked)
+                                        {
+                                            <span class="status-badge status-booked">Booked</span>
+                                        }
+                                        else if (appt.Status == BookMySlot.Models.AppointmentStatus.Completed)
+                                        {
+                                            <span class="status-badge status-completed">Completed</span>
+                                        }
+                                        else if (appt.Status == BookMySlot.Models.AppointmentStatus.Cancelled)
+                                        {
+                                            <span class="status-badge status-cancelled">Cancelled</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="status-badge status-noshow">No Show</span>
+                                        }
+                                    </td>
+                                    <td class="text-end">
+                                        @if (appt.Status == BookMySlot.Models.AppointmentStatus.Booked)
+                                        {
+                                            <div class="d-inline-flex gap-1">
+                                                <form asp-action="MarkStatus" method="post" class="d-inline">
+                                                    @Html.AntiForgeryToken()
+                                                    <input type="hidden" name="appointmentId" value="@appt.Id" />
+                                                    <input type="hidden" name="status" value="Completed" />
+                                                    <button type="submit" class="btn btn-sm btn-success" title="Mark Completed">
+                                                        <i class="bi bi-check-lg me-1"></i>Completed
+                                                    </button>
+                                                </form>
+                                                <form asp-action="MarkStatus" method="post" class="d-inline">
+                                                    @Html.AntiForgeryToken()
+                                                    <input type="hidden" name="appointmentId" value="@appt.Id" />
+                                                    <input type="hidden" name="status" value="NoShow" />
+                                                    <button type="submit" class="btn btn-sm btn-outline-warning text-dark" title="Mark No-Show">
+                                                        <i class="bi bi-x-circle me-1"></i>No-Show
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted small">Closed</span>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="text-center py-4 text-muted small">
+                    <i class="bi bi-calendar-check text-muted fs-2 d-block mb-1"></i>
+                    No appointments scheduled for today.
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Upcoming Appointments -->
+    <div class="card border-0 shadow-sm rounded-4 table-card">
+        <div class="table-card-header fw-bold d-flex align-items-center gap-2">
+            <i class="bi bi-calendar-event text-teal"></i>
+            <span>Upcoming Scheduled Appointments</span>
+        </div>
+        <div class="card-body p-0">
+            @if (Model.UpcomingAppointments.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th>Client Name</th>
+                                <th>Service</th>
+                                <th>Schedule</th>
+                                <th>Notes / Purpose</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var appt in Model.UpcomingAppointments)
+                            {
+                                <tr>
+                                    <td>
+                                        <div class="fw-bold text-dark">@appt.CustomerName</div>
+                                        <div class="small text-muted">@appt.CustomerEmail</div>
+                                    </td>
+                                    <td>@appt.ServiceName</td>
+                                    <td class="small fw-semibold text-dark">@appt.FormattedTime</td>
+                                    <td class="small text-secondary">
+                                        @(string.IsNullOrWhiteSpace(appt.Notes) ? "-" : appt.Notes)
+                                    </td>
+                                    <td>
+                                        <span class="status-badge status-booked">Booked</span>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="text-center py-4 text-muted small">No upcoming client bookings in queue.</div>
+            }
+        </div>
+    </div>
+</div>

@@ -1,0 +1,124 @@
+@model BookMySlot.ViewModels.Customer.AppointmentDetailsViewModel
+@{
+    ViewData["Title"] = $"Appointment #{Model.AppointmentId} Details";
+}
+
+<div class="container py-4">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a asp-action="Dashboard">Dashboard</a></li>
+            <li class="breadcrumb-item"><a asp-action="MyAppointments">My Appointments</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Booking #@Model.AppointmentId</li>
+        </ol>
+    </nav>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                <div class="card-header p-4 text-white d-flex justify-content-between align-items-center"
+                     style="background: linear-gradient(135deg, #091b30 0%, #0f2a4a 100%);">
+                    <div>
+                        <span class="badge bg-light text-dark px-2 py-1 rounded-pill small mb-1">
+                            Booking ID: #@Model.AppointmentId
+                        </span>
+                        <h3 class="fw-bold mb-0">@Model.ServiceName</h3>
+                    </div>
+                    <div>
+                        @if (Model.Status == BookMySlot.Models.AppointmentStatus.Booked)
+                        {
+                            <span class="status-badge status-booked bg-white text-primary border-0 fs-6">Booked</span>
+                        }
+                        else if (Model.Status == BookMySlot.Models.AppointmentStatus.Completed)
+                        {
+                            <span class="status-badge status-completed bg-white text-success border-0 fs-6">Completed</span>
+                        }
+                        else if (Model.Status == BookMySlot.Models.AppointmentStatus.Cancelled)
+                        {
+                            <span class="status-badge status-cancelled bg-white text-danger border-0 fs-6">Cancelled</span>
+                        }
+                        else
+                        {
+                            <span class="status-badge status-noshow bg-white text-warning border-0 fs-6">No Show</span>
+                        }
+                    </div>
+                </div>
+
+                <div class="card-body p-4 p-md-5">
+                    <div class="row g-4 mb-4">
+                        <div class="col-md-6">
+                            <div class="p-3 bg-light rounded-3">
+                                <label class="small text-muted fw-semibold text-uppercase">Scheduled Date & Time</label>
+                                <div class="fs-6 fw-bold text-dark mt-1">@Model.FormattedSchedule</div>
+                                <div class="text-secondary small mt-1">
+                                    <i class="bi bi-clock me-1"></i>Duration: @Model.DurationMinutes minutes
+                                </div>
+                                <div class="text-muted small mt-1">
+                                    <i class="bi bi-globe me-1"></i>@Model.TimeZoneDisplayName
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="p-3 bg-light rounded-3">
+                                <label class="small text-muted fw-semibold text-uppercase">Assigned Specialist</label>
+                                <div class="fs-6 fw-bold text-dark mt-1">@Model.ProviderName</div>
+                                <div class="text-secondary small mt-1">
+                                    <i class="bi bi-envelope me-1"></i>@Model.ProviderEmail
+                                </div>
+                                <div class="text-teal small mt-1 fw-bold">
+                                    <i class="bi bi-currency-rupee me-1"></i>Fee: ₹@Model.Price.ToString("N0")
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Booking Timestamps & Audit -->
+                    <div class="mb-4">
+                        <h6 class="fw-bold text-dark mb-2">Booking Record</h6>
+                        <ul class="list-group list-group-flush border rounded-3 small">
+                            <li class="list-group-item d-flex justify-content-between">
+                                <span class="text-muted">Booked On:</span>
+                                <span class="fw-semibold">@Model.FormattedBookedAt</span>
+                            </li>
+                            @if (Model.CancelledAtUtc.HasValue)
+                            {
+                                <li class="list-group-item d-flex justify-content-between bg-danger bg-opacity-10 text-danger">
+                                    <span>Cancelled On:</span>
+                                    <span class="fw-bold">@Model.FormattedCancelledAt</span>
+                                </li>
+                            }
+                            <li class="list-group-item">
+                                <span class="text-muted d-block mb-1">Appointment Notes:</span>
+                                <span class="fw-normal text-secondary">
+                                    @(string.IsNullOrWhiteSpace(Model.Notes) ? "No special instructions provided." : Model.Notes)
+                                </span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="d-flex flex-wrap gap-2 justify-content-end pt-3 border-top">
+                        <a asp-action="MyAppointments" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left me-1"></i>Back to List
+                        </a>
+
+                        @if (Model.CanReschedule)
+                        {
+                            <a asp-action="Reschedule" asp-route-id="@Model.AppointmentId" class="btn btn-bms-outline-teal">
+                                <i class="bi bi-arrow-repeat me-1"></i>Reschedule Slot
+                            </a>
+                        }
+
+                        @if (Model.CanCancel)
+                        {
+                            <a asp-action="Cancel" asp-route-id="@Model.AppointmentId" class="btn btn-outline-danger">
+                                <i class="bi bi-x-circle me-1"></i>Cancel Appointment
+                            </a>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

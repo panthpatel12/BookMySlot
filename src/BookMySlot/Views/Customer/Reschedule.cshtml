@@ -1,0 +1,102 @@
+@model BookMySlot.ViewModels.Customer.RescheduleAppointmentViewModel
+@{
+    ViewData["Title"] = $"Reschedule Appointment #{Model.AppointmentId}";
+}
+
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                <div class="card-header p-4 text-white" style="background: linear-gradient(135deg, #091b30 0%, #0284c7 100%);">
+                    <span class="badge bg-light text-dark px-3 py-1 rounded-pill small mb-2 fw-semibold">
+                        Reschedule Booking #@Model.AppointmentId
+                    </span>
+                    <h2 class="fw-bold mb-1">Select a New Appointment Slot</h2>
+                    <p class="text-light text-opacity-80 small mb-0">Seamlessly move your session to a more convenient time.</p>
+                </div>
+
+                <div class="card-body p-4 p-md-5">
+                    <!-- Current Booking Summary -->
+                    <div class="p-3 bg-light rounded-3 border mb-4">
+                        <span class="badge bg-secondary text-white px-2 py-1 small text-uppercase">Current Session</span>
+                        <div class="fs-5 fw-bold text-dark mt-2 mb-1">@Model.ServiceName</div>
+                        <div class="small text-secondary mb-1">
+                            <i class="bi bi-person me-1"></i>Specialist: <strong>@Model.CurrentProviderName</strong>
+                        </div>
+                        <div class="small text-muted">
+                            <i class="bi bi-clock-history me-1"></i>Current Time: <strong>@Model.CurrentSchedule</strong>
+                        </div>
+                        <div class="small text-muted mt-1" style="font-size: 0.78rem;">
+                            <i class="bi bi-globe me-1"></i>Timezone: @Model.TimeZoneDisplayName
+                        </div>
+                    </div>
+
+                    @if (Model.AvailableSlots.Any())
+                    {
+                        <form asp-action="Reschedule" method="post">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" asp-for="AppointmentId" />
+                            <input type="hidden" asp-for="CurrentSlotId" />
+                            <input type="hidden" asp-for="ServiceName" />
+                            <input type="hidden" asp-for="CurrentProviderName" />
+                            <input type="hidden" asp-for="CurrentSchedule" />
+
+                            <div class="mb-4">
+                                <label class="form-label fw-bold text-dark mb-3">
+                                    <i class="bi bi-calendar-check text-teal me-1"></i>Choose an Alternative Slot
+                                </label>
+                                <div class="row g-3">
+                                    @foreach (var slot in Model.AvailableSlots)
+                                    {
+                                        <div class="col-md-6">
+                                            <label class="card p-3 rounded-3 border h-100 cursor-pointer slot-select-card" style="cursor: pointer;">
+                                                <div class="d-flex align-items-start gap-2">
+                                                    <input type="radio" asp-for="SelectedNewSlotId" value="@slot.SlotId" class="form-check-input mt-1" />
+                                                    <div>
+                                                        <div class="fw-bold text-dark">@slot.FormattedSchedule</div>
+                                                        <div class="small text-muted mt-1">
+                                                            <i class="bi bi-person-circle me-1"></i>@slot.ProviderName
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </label>
+                                        </div>
+                                    }
+                                </div>
+                                <span asp-validation-for="SelectedNewSlotId" class="text-danger small mt-2 d-block"></span>
+                            </div>
+
+                            <div class="alert alert-info py-2 small mb-4">
+                                <i class="bi bi-info-circle me-1"></i>
+                                If the new slot becomes unavailable during submission, your current appointment will remain completely unchanged.
+                            </div>
+
+                            <div class="d-flex justify-content-between align-items-center">
+                                <a asp-action="Details" asp-route-id="@Model.AppointmentId" class="btn btn-outline-secondary">
+                                    <i class="bi bi-arrow-left me-1"></i>Cancel & Back
+                                </a>
+                                <button type="submit" class="btn btn-primary px-4 py-2 fw-semibold">
+                                    <i class="bi bi-arrow-repeat me-1"></i>Confirm Reschedule
+                                </button>
+                            </div>
+                        </form>
+                    }
+                    else
+                    {
+                        <div class="text-center py-4">
+                            <i class="bi bi-calendar-x text-muted fs-1 mb-2"></i>
+                            <p class="text-muted small mb-3">There are no alternative slots currently open for this service.</p>
+                            <a asp-action="Details" asp-route-id="@Model.AppointmentId" class="btn btn-outline-secondary btn-sm">
+                                Back to Appointment Details
+                            </a>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

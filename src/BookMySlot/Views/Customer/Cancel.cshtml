@@ -1,0 +1,49 @@
+@model BookMySlot.ViewModels.Common.AppointmentListItemViewModel
+@{
+    ViewData["Title"] = $"Cancel Booking #{Model.Id}";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-7 col-lg-6">
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                <div class="card-header bg-danger text-white p-4 text-center">
+                    <i class="bi bi-exclamation-triangle-fill fs-1 mb-2"></i>
+                    <h3 class="fw-bold mb-1">Confirm Cancellation</h3>
+                    <p class="text-light text-opacity-80 small mb-0">Are you sure you want to cancel this appointment?</p>
+                </div>
+
+                <div class="card-body p-4 p-md-5">
+                    <div class="p-3 bg-light rounded-3 border mb-4">
+                        <div class="fw-bold text-dark fs-5 mb-1">@Model.ServiceName</div>
+                        <div class="text-secondary small mb-2">
+                            <i class="bi bi-person me-1"></i>Specialist: <strong>@Model.ProviderName</strong>
+                        </div>
+                        <div class="text-muted small">
+                            <i class="bi bi-calendar3 me-1"></i>Schedule: <strong>@Model.FormattedTime</strong>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-danger py-2 small mb-4">
+                        <i class="bi bi-info-circle me-1"></i>
+                        Cancelling will immediately release this slot so other customers can book it. Your historical appointment record will be preserved with status <strong>Cancelled</strong>.
+                    </div>
+
+                    <form asp-action="Cancel" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="id" value="@Model.Id" />
+
+                        <div class="d-flex justify-content-between align-items-center">
+                            <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-outline-secondary">
+                                Keep My Booking
+                            </a>
+                            <button type="submit" class="btn btn-danger px-4 py-2 fw-semibold">
+                                <i class="bi bi-trash3 me-1"></i>Yes, Cancel Appointment
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

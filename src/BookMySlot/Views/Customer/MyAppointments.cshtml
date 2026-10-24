@@ -1,0 +1,128 @@
+@model List<BookMySlot.ViewModels.Common.AppointmentListItemViewModel>
+@{
+    ViewData["Title"] = "My Appointments";
+    var selectedStatus = ViewBag.SelectedStatus as BookMySlot.Models.AppointmentStatus?;
+}
+
+<div class="container py-4">
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold text-dark mb-1">My Appointments</h2>
+            <p class="text-muted small mb-0">View and manage all your past, present, and scheduled appointments.</p>
+        </div>
+        <div>
+            <a asp-controller="Home" asp-action="Index" class="btn btn-bms-teal btn-sm shadow-sm">
+                <i class="bi bi-calendar-plus me-1"></i>Book New Appointment
+            </a>
+        </div>
+    </div>
+
+    <!-- Status Filters -->
+    <div class="mb-4 d-flex flex-wrap gap-2">
+        <a asp-action="MyAppointments" class="btn btn-sm @(selectedStatus == null ? "btn-bms-primary" : "btn-outline-secondary")">
+            All Appointments
+        </a>
+        <a asp-action="MyAppointments" asp-route-status="Booked" class="btn btn-sm @(selectedStatus == BookMySlot.Models.AppointmentStatus.Booked ? "btn-bms-primary" : "btn-outline-secondary")">
+            Active Bookings
+        </a>
+        <a asp-action="MyAppointments" asp-route-status="Completed" class="btn btn-sm @(selectedStatus == BookMySlot.Models.AppointmentStatus.Completed ? "btn-bms-primary" : "btn-outline-secondary")">
+            Completed
+        </a>
+        <a asp-action="MyAppointments" asp-route-status="Cancelled" class="btn btn-sm @(selectedStatus == BookMySlot.Models.AppointmentStatus.Cancelled ? "btn-bms-primary" : "btn-outline-secondary")">
+            Cancelled
+        </a>
+        <a asp-action="MyAppointments" asp-route-status="NoShow" class="btn btn-sm @(selectedStatus == BookMySlot.Models.AppointmentStatus.NoShow ? "btn-bms-primary" : "btn-outline-secondary")">
+            No Show
+        </a>
+    </div>
+
+    <!-- Table -->
+    <div class="card border-0 shadow-sm rounded-4 table-card">
+        <div class="card-body p-0">
+            @if (Model.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th>Booking ID</th>
+                                <th>Service</th>
+                                <th>Specialist</th>
+                                <th>Schedule</th>
+                                <th>Fee</th>
+                                <th>Status</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var appt in Model)
+                            {
+                                <tr>
+                                    <td><span class="text-muted small">#@appt.Id</span></td>
+                                    <td>
+                                        <div class="fw-semibold text-dark">@appt.ServiceName</div>
+                                        <div class="small text-muted">@appt.DurationMinutes mins</div>
+                                    </td>
+                                    <td>
+                                        <div class="fw-semibold text-secondary">@appt.ProviderName</div>
+                                    </td>
+                                    <td>
+                                        <div class="small fw-semibold text-dark">@appt.FormattedTime</div>
+                                        <div class="text-muted" style="font-size: 0.75rem;">Booked: @appt.FormattedBookedAt</div>
+                                    </td>
+                                    <td>
+                                        <span class="fw-bold">₹@appt.ServicePrice.ToString("N0")</span>
+                                    </td>
+                                    <td>
+                                        @if (appt.Status == BookMySlot.Models.AppointmentStatus.Booked)
+                                        {
+                                            <span class="status-badge status-booked">Booked</span>
+                                        }
+                                        else if (appt.Status == BookMySlot.Models.AppointmentStatus.Completed)
+                                        {
+                                            <span class="status-badge status-completed">Completed</span>
+                                        }
+                                        else if (appt.Status == BookMySlot.Models.AppointmentStatus.Cancelled)
+                                        {
+                                            <span class="status-badge status-cancelled">Cancelled</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="status-badge status-noshow">No Show</span>
+                                        }
+                                    </td>
+                                    <td class="text-end">
+                                        <div class="btn-group btn-group-sm">
+                                            <a asp-action="Details" asp-route-id="@appt.Id" class="btn btn-outline-secondary" title="View Details">
+                                                <i class="bi bi-eye"></i>
+                                            </a>
+                                            @if (appt.CanReschedule)
+                                            {
+                                                <a asp-action="Reschedule" asp-route-id="@appt.Id" class="btn btn-outline-primary" title="Reschedule">
+                                                    <i class="bi bi-arrow-repeat"></i>
+                                                </a>
+                                            }
+                                            @if (appt.CanCancel)
+                                            {
+                                                <a asp-action="Cancel" asp-route-id="@appt.Id" class="btn btn-outline-danger" title="Cancel Appointment">
+                                                    <i class="bi bi-x-circle"></i>
+                                                </a>
+                                            }
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="text-center py-5">
+                    <i class="bi bi-inbox text-muted fs-1 mb-2"></i>
+                    <p class="text-muted small">No appointment records match the selected filter.</p>
+                </div>
+            }
+        </div>
+    </div>
+</div>

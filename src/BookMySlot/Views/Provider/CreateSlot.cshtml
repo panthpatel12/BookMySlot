@@ -1,0 +1,63 @@
+@model BookMySlot.ViewModels.Provider.CreateSlotViewModel
+@{
+    ViewData["Title"] = "Create Appointment Slot";
+}
+
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-7 col-lg-6">
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                <div class="card-header p-4 text-white" style="background: linear-gradient(135deg, #091b30 0%, #0d9488 100%);">
+                    <span class="badge bg-light text-dark px-3 py-1 rounded-pill small mb-2 fw-semibold">
+                        Provider Availability
+                    </span>
+                    <h3 class="fw-bold mb-1">Create Appointment Slot</h3>
+                    <p class="text-light text-opacity-80 small mb-0">Open a new slot for customers to book.</p>
+                </div>
+
+                <div class="card-body p-4 p-md-5">
+                    <form asp-action="CreateSlot" method="post" novalidate>
+                        @Html.AntiForgeryToken()
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2 small mb-3" role="alert"></div>
+
+                        <div class="mb-3">
+                            <label asp-for="ServiceId" class="form-label fw-semibold text-secondary small"></label>
+                            <select asp-for="ServiceId" asp-items="Model.AssignedServices" class="form-select" autofocus>
+                                <option value="">-- Choose Assigned Service --</option>
+                            </select>
+                            <span asp-validation-for="ServiceId" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="LocalStartTime" class="form-label fw-semibold text-secondary small"></label>
+                            <input asp-for="LocalStartTime" type="datetime-local" class="form-control" 
+                                   value="@Model.LocalStartTime.ToString("yyyy-MM-ddTHH:mm")" />
+                            <span asp-validation-for="LocalStartTime" class="text-danger small"></span>
+                            <div class="form-text small text-muted">
+                                <i class="bi bi-clock me-1"></i>Slot times are based on <strong>@Model.TimeZoneDisplayName</strong>. Duration is automatically set based on service requirements.
+                            </div>
+                        </div>
+
+                        <div class="alert alert-info py-2 small mb-4">
+                            <i class="bi bi-info-circle me-1"></i>
+                            The system will reject slot creation if it overlaps with any of your existing active slots.
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center">
+                            <a asp-action="Schedule" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-left me-1"></i>Cancel
+                            </a>
+                            <button type="submit" class="btn btn-bms-teal px-4 py-2 fw-semibold">
+                                <i class="bi bi-plus-circle me-1"></i>Create Slot
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

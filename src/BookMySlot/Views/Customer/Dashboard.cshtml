@@ -1,0 +1,213 @@
+@model BookMySlot.ViewModels.Customer.CustomerDashboardViewModel
+@{
+    ViewData["Title"] = "Customer Dashboard";
+}
+
+<div class="container py-4">
+    <!-- Header -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold text-dark mb-1">Customer Portal</h2>
+            <p class="text-muted small mb-0">Welcome, <strong>@Model.CustomerName</strong>. Manage your scheduled sessions.</p>
+        </div>
+        <div>
+            <a asp-controller="Home" asp-action="Index" class="btn btn-bms-teal shadow-sm">
+                <i class="bi bi-calendar-plus me-1"></i>Book New Appointment
+            </a>
+        </div>
+    </div>
+
+    <!-- Stat Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3 col-sm-6">
+            <div class="stat-card">
+                <div class="stat-icon primary">
+                    <i class="bi bi-calendar-check"></i>
+                </div>
+                <div>
+                    <div class="stat-value">@Model.UpcomingCount</div>
+                    <div class="stat-label">Upcoming</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <div class="stat-card">
+                <div class="stat-icon success">
+                    <i class="bi bi-patch-check"></i>
+                </div>
+                <div>
+                    <div class="stat-value">@Model.CompletedCount</div>
+                    <div class="stat-label">Completed</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <div class="stat-card">
+                <div class="stat-icon warning">
+                    <i class="bi bi-calendar-x"></i>
+                </div>
+                <div>
+                    <div class="stat-value">@Model.CancelledCount</div>
+                    <div class="stat-label">Cancelled</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <div class="stat-card">
+                <div class="stat-icon teal">
+                    <i class="bi bi-receipt-cutoff"></i>
+                </div>
+                <div>
+                    <div class="stat-value">@Model.TotalBookingsCount</div>
+                    <div class="stat-label">Total Bookings</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Upcoming Appointments Table -->
+    <div class="card border-0 shadow-sm rounded-4 mb-4 table-card">
+        <div class="table-card-header d-flex justify-content-between align-items-center">
+            <div class="fw-bold d-flex align-items-center gap-2">
+                <i class="bi bi-clock-history text-teal"></i>
+                <span>Upcoming Appointments</span>
+            </div>
+            <span class="badge bg-light text-secondary border">
+                <i class="bi bi-globe me-1"></i>@Model.TimeZoneDisplayName
+            </span>
+        </div>
+        <div class="card-body p-0">
+            @if (Model.UpcomingAppointments.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th>Service</th>
+                                <th>Specialist</th>
+                                <th>Schedule</th>
+                                <th>Fee</th>
+                                <th>Status</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var appt in Model.UpcomingAppointments)
+                            {
+                                <tr>
+                                    <td>
+                                        <div class="fw-semibold text-dark">@appt.ServiceName</div>
+                                        <div class="small text-muted">@appt.DurationMinutes mins</div>
+                                    </td>
+                                    <td>
+                                        <div class="fw-semibold text-secondary">@appt.ProviderName</div>
+                                    </td>
+                                    <td>
+                                        <div class="small fw-semibold text-dark">@appt.FormattedTime</div>
+                                    </td>
+                                    <td>
+                                        <span class="fw-bold text-dark">₹@appt.ServicePrice.ToString("N0")</span>
+                                    </td>
+                                    <td>
+                                        <span class="status-badge status-booked">
+                                            <i class="bi bi-dot"></i>Booked
+                                        </span>
+                                    </td>
+                                    <td class="text-end">
+                                        <div class="btn-group btn-group-sm">
+                                            <a asp-action="Details" asp-route-id="@appt.Id" class="btn btn-outline-secondary" title="View Details">
+                                                <i class="bi bi-eye"></i>
+                                            </a>
+                                            <a asp-action="Reschedule" asp-route-id="@appt.Id" class="btn btn-outline-primary" title="Reschedule">
+                                                <i class="bi bi-arrow-repeat"></i>
+                                            </a>
+                                            <a asp-action="Cancel" asp-route-id="@appt.Id" class="btn btn-outline-danger" title="Cancel Appointment">
+                                                <i class="bi bi-x-circle"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="text-center py-5">
+                    <i class="bi bi-calendar2-plus text-muted fs-1 mb-2"></i>
+                    <p class="text-muted small mb-3">You have no upcoming appointments.</p>
+                    <a asp-controller="Home" asp-action="Index" class="btn btn-bms-teal btn-sm">
+                        Browse Open Slots
+                    </a>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Recent History Section -->
+    <div class="card border-0 shadow-sm rounded-4 table-card">
+        <div class="table-card-header d-flex justify-content-between align-items-center">
+            <div class="fw-bold d-flex align-items-center gap-2">
+                <i class="bi bi-journal-text text-secondary"></i>
+                <span>Recent Booking History</span>
+            </div>
+            <a asp-action="MyAppointments" class="btn btn-outline-secondary btn-sm">View All History</a>
+        </div>
+        <div class="card-body p-0">
+            @if (Model.RecentHistory.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th>Service</th>
+                                <th>Provider</th>
+                                <th>Date & Time</th>
+                                <th>Status</th>
+                                <th class="text-end">Details</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var appt in Model.RecentHistory)
+                            {
+                                <tr>
+                                    <td class="fw-semibold">@appt.ServiceName</td>
+                                    <td>@appt.ProviderName</td>
+                                    <td class="small">@appt.FormattedTime</td>
+                                    <td>
+                                        @if (appt.Status == BookMySlot.Models.AppointmentStatus.Completed)
+                                        {
+                                            <span class="status-badge status-completed">Completed</span>
+                                        }
+                                        else if (appt.Status == BookMySlot.Models.AppointmentStatus.Cancelled)
+                                        {
+                                            <span class="status-badge status-cancelled">Cancelled</span>
+                                        }
+                                        else if (appt.Status == BookMySlot.Models.AppointmentStatus.NoShow)
+                                        {
+                                            <span class="status-badge status-noshow">No Show</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="status-badge status-booked">Booked</span>
+                                        }
+                                    </td>
+                                    <td class="text-end">
+                                        <a asp-action="Details" asp-route-id="@appt.Id" class="btn btn-sm btn-outline-secondary">
+                                            <i class="bi bi-chevron-right"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="text-center py-4 text-muted small">No past booking records yet.</div>
+            }
+        </div>
+    </div>
+</div>

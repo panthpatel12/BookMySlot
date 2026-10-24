@@ -1,0 +1,77 @@
+@model BookMySlot.ViewModels.Admin.ProviderAssignmentViewModel
+@{
+    ViewData["Title"] = $"Manage Provider - {Model.ProviderName}";
+}
+
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-7">
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                <div class="card-header p-4 text-white" style="background: linear-gradient(135deg, #091b30 0%, #0f2a4a 100%);">
+                    <span class="badge bg-light text-dark px-2 py-1 rounded-pill small mb-1">Provider ID: #@Model.ProviderProfileId</span>
+                    <h3 class="fw-bold mb-1">@Model.ProviderName</h3>
+                    <p class="text-light text-opacity-80 small mb-0">@Model.Email</p>
+                </div>
+
+                <div class="card-body p-4 p-md-5">
+                    <form asp-action="ManageProvider" method="post" novalidate>
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" asp-for="ProviderProfileId" />
+                        <input type="hidden" asp-for="ProviderName" />
+                        <input type="hidden" asp-for="Email" />
+
+                        <div class="mb-3">
+                            <label asp-for="Bio" class="form-label fw-semibold text-secondary small"></label>
+                            <textarea asp-for="Bio" class="form-control" rows="3"></textarea>
+                            <span asp-validation-for="Bio" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-4">
+                            <div class="form-check form-switch">
+                                <input asp-for="IsActive" class="form-check-input" />
+                                <label asp-for="IsActive" class="form-check-label fw-semibold small text-secondary"></label>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-bold text-dark mb-2">Service Assignments</label>
+                            <p class="text-muted small mb-3">Check the services this specialist is authorized to conduct.</p>
+                            <div class="row g-2">
+                                @foreach (var s in Model.Services)
+                                {
+                                    <div class="col-12">
+                                        <div class="p-3 bg-light rounded-3 border d-flex justify-content-between align-items-center">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" name="SelectedServiceIds" value="@s.ServiceId" 
+                                                       id="srv_@s.ServiceId" @(s.IsAssigned ? "checked" : "") />
+                                                <label class="form-check-label ms-2 fw-semibold text-dark" for="srv_@s.ServiceId">
+                                                    @s.ServiceName
+                                                </label>
+                                            </div>
+                                            <div class="small text-muted">
+                                                @s.DurationMinutes mins &bull; ₹@s.Price.ToString("N0")
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center">
+                            <a asp-action="Providers" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-left me-1"></i>Cancel
+                            </a>
+                            <button type="submit" class="btn btn-bms-primary px-4 py-2 fw-semibold">
+                                <i class="bi bi-check-lg me-1"></i>Save Assignments
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

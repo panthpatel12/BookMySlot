@@ -1,0 +1,170 @@
+@model BookMySlot.ViewModels.Admin.AdminDashboardViewModel
+@{
+    ViewData["Title"] = "Administrator Dashboard";
+}
+
+<div class="container py-4">
+    <!-- Header -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold text-dark mb-1">Administrator Dashboard</h2>
+            <p class="text-muted small mb-0">System overview, metrics, and central management controls.</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a asp-action="CreateService" class="btn btn-outline-secondary btn-sm">
+                <i class="bi bi-plus-lg me-1"></i>New Service
+            </a>
+            <a asp-action="CreateProvider" class="btn btn-bms-primary btn-sm">
+                <i class="bi bi-person-plus me-1"></i>New Provider
+            </a>
+            <a asp-action="Appointments" class="btn btn-bms-teal btn-sm">
+                <i class="bi bi-list-check me-1"></i>Manage Bookings
+            </a>
+        </div>
+    </div>
+
+    <!-- Top KPI Stat Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-lg-3 col-sm-6">
+            <div class="stat-card">
+                <div class="stat-icon primary">
+                    <i class="bi bi-people"></i>
+                </div>
+                <div>
+                    <div class="stat-value">@Model.TotalCustomers</div>
+                    <div class="stat-label">Registered Customers</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-sm-6">
+            <div class="stat-card">
+                <div class="stat-icon teal">
+                    <i class="bi bi-person-badge"></i>
+                </div>
+                <div>
+                    <div class="stat-value">@Model.TotalProviders</div>
+                    <div class="stat-label">Specialist Providers</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-sm-6">
+            <div class="stat-card">
+                <div class="stat-icon warning">
+                    <i class="bi bi-grid-3x3-gap"></i>
+                </div>
+                <div>
+                    <div class="stat-value">@Model.ActiveServicesCount / @Model.TotalServices</div>
+                    <div class="stat-label">Active / Total Services</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-sm-6">
+            <div class="stat-card">
+                <div class="stat-icon success">
+                    <i class="bi bi-currency-rupee"></i>
+                </div>
+                <div>
+                    <div class="stat-value">₹@Model.TotalRevenueCompleted.ToString("N0")</div>
+                    <div class="stat-label">Completed Revenue</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Booking Distribution Breakdown -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3 col-6">
+            <div class="card p-3 rounded-4 border-0 shadow-sm border-start border-primary border-4">
+                <div class="text-muted small text-uppercase fw-semibold">Booked (Active)</div>
+                <div class="fs-4 fw-bold text-primary mt-1">@Model.BookedAppointmentsCount</div>
+            </div>
+        </div>
+        <div class="col-md-3 col-6">
+            <div class="card p-3 rounded-4 border-0 shadow-sm border-start border-success border-4">
+                <div class="text-muted small text-uppercase fw-semibold">Completed</div>
+                <div class="fs-4 fw-bold text-success mt-1">@Model.CompletedAppointmentsCount</div>
+            </div>
+        </div>
+        <div class="col-md-3 col-6">
+            <div class="card p-3 rounded-4 border-0 shadow-sm border-start border-danger border-4">
+                <div class="text-muted small text-uppercase fw-semibold">Cancelled</div>
+                <div class="fs-4 fw-bold text-danger mt-1">@Model.CancelledAppointmentsCount</div>
+            </div>
+        </div>
+        <div class="col-md-3 col-6">
+            <div class="card p-3 rounded-4 border-0 shadow-sm border-start border-warning border-4">
+                <div class="text-muted small text-uppercase fw-semibold">No-Show</div>
+                <div class="fs-4 fw-bold text-warning mt-1">@Model.NoShowAppointmentsCount</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Appointments Table -->
+    <div class="card border-0 shadow-sm rounded-4 table-card">
+        <div class="table-card-header d-flex justify-content-between align-items-center">
+            <div class="fw-bold d-flex align-items-center gap-2">
+                <i class="bi bi-receipt text-teal"></i>
+                <span>Recent Platform Bookings</span>
+            </div>
+            <a asp-action="Appointments" class="btn btn-outline-secondary btn-sm">View All Bookings</a>
+        </div>
+        <div class="card-body p-0">
+            @if (Model.RecentAppointments.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th>Booking ID</th>
+                                <th>Customer</th>
+                                <th>Specialist</th>
+                                <th>Service</th>
+                                <th>Schedule</th>
+                                <th>Fee</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var appt in Model.RecentAppointments)
+                            {
+                                <tr>
+                                    <td><span class="text-muted small">#@appt.Id</span></td>
+                                    <td>
+                                        <div class="fw-bold text-dark">@appt.CustomerName</div>
+                                        <div class="small text-muted">@appt.CustomerEmail</div>
+                                    </td>
+                                    <td>@appt.ProviderName</td>
+                                    <td>@appt.ServiceName</td>
+                                    <td class="small">@appt.FormattedTime</td>
+                                    <td class="fw-bold">₹@appt.ServicePrice.ToString("N0")</td>
+                                    <td>
+                                        @if (appt.Status == BookMySlot.Models.AppointmentStatus.Booked)
+                                        {
+                                            <span class="status-badge status-booked">Booked</span>
+                                        }
+                                        else if (appt.Status == BookMySlot.Models.AppointmentStatus.Completed)
+                                        {
+                                            <span class="status-badge status-completed">Completed</span>
+                                        }
+                                        else if (appt.Status == BookMySlot.Models.AppointmentStatus.Cancelled)
+                                        {
+                                            <span class="status-badge status-cancelled">Cancelled</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="status-badge status-noshow">No Show</span>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="text-center py-4 text-muted small">No platform bookings recorded yet.</div>
+            }
+        </div>
+    </div>
+</div>
